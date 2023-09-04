@@ -1,7 +1,7 @@
 name: Run Python script on Push
 
 on:
-  push:
+  pull-request:
     branches:
       - main
 
