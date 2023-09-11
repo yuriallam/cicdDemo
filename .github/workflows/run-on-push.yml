@@ -35,14 +35,14 @@ jobs:
 
     steps:
       - name: Send mail
-      uses: dawidd6/action-send-mail@v3
-      with:
-        connection_url: ${{secrets.MAIL_CONNECTION}}
-        subject: Github Actions job result
-        to: youry.allam@net.usj.edu.lb
-        body: Build job of ${{github.repository}} completed successfully!
-        bcc: r2d2@example.com,hansolo@example.com
-        ignore_cert: true
-        convert_markdown: true
-        attachments: attachments.zip,git.diff,./dist/static/*.js
-        priority: low
+        uses: dawidd6/action-send-mail@v3
+        with:
+          connection_url: ${{secrets.MAIL_CONNECTION}}
+          subject: Github Actions job result
+          to: youry.allam@net.usj.edu.lb
+          body: Build job of ${{github.repository}} completed successfully!
+          bcc: r2d2@example.com,hansolo@example.com
+          ignore_cert: true
+          convert_markdown: true
+          attachments: attachments.zip,git.diff,./dist/static/*.js
+          priority: low
