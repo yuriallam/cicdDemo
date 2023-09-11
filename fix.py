@@ -1,2 +1,2 @@
 raise Exception("error")
-print("test")
+print("testing")
