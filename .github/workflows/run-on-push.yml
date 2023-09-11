@@ -6,7 +6,7 @@ on:
       - dev
 
 jobs:
-  run-python:
+  run-python-test1:
     runs-on: self-hosted
 
     steps:
@@ -15,3 +15,13 @@ jobs:
 
       - name: Run Python script
         run: python3 test.py
+  run-python-test1:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Run Python script
+        run: python3 test2.py
+  
