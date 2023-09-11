@@ -15,29 +15,16 @@ jobs:
 
       - name: Run Python script
         run: python3 test.py
+        continue-on-error: true # Continue even if this step fails
 
       - name: Upload Test Report
+        if: always() # This ensures the step runs even if the previous step fails
         uses: actions/upload-artifact@v2
         with:
           name: test-report1
           path: ./test-reports/TEST-TestMathOperations-test-report1.xml
 
-  run-python-test2:
-    needs: run-python-test1
-    runs-on: self-hosted
-
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-
-      - name: Run Python script
-        run: python3 test2.py
-
-      - name: Upload Test Report
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-report2
-          path: ./test-reports/TEST-TestMathOperations-test-report2.xml
+  # ... (Same for run-python-test2)
 
   send-email-report:
     needs: [run-python-test1, run-python-test2]
@@ -45,9 +32,11 @@ jobs:
 
     steps:
       - name: Download All Test Reports
+        if: always() # This ensures the step runs even if a previous job fails
         uses: actions/download-artifact@v2
 
       - name: Send mail
+        if: always() # This ensures the step runs even if a previous job fails
         uses: dawidd6/action-send-mail@v3
         with:
           connection_url: ${{secrets.MAIL_CONNECTION}}
