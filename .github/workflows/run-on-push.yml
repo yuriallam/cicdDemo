@@ -3,7 +3,7 @@ name: Run Python script on Push
 on:
   pull_request:
     branches:
-      - main
+      - dev
 
 jobs:
   run-python:
@@ -14,4 +14,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Python script
-        run: python3 testing.py
+        run: python3 test.py
