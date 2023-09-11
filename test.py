@@ -1,4 +1,6 @@
 import unittest
+from xmlrunner import XMLTestRunner
+
 from main import add
 
 class TestMathOperations(unittest.TestCase):
@@ -10,4 +12,4 @@ class TestMathOperations(unittest.TestCase):
         self.assertEqual(add(-1, -1), -2)
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner=XMLTestRunner(output='test-reports'))

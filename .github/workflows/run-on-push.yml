@@ -15,7 +15,10 @@ jobs:
 
       - name: Run Python script
         run: python3 test.py
+        continue-on-error: true
+
   run-python-test2:
+    needs: run-python-test1
     runs-on: self-hosted
 
     steps:
@@ -24,3 +27,29 @@ jobs:
 
       - name: Run Python script
         run: python3 test2.py
+        continue-on-error: true
+
+  send-email-report:
+    needs: [run-python-test1, run-python-test2]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Email Report
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: |
+          apt-get update
+          apt-get install -y msmtp msmtp-mta mailutils
+          echo "account default" > ~/.msmtprc
+          echo "host smtp.gmail.com" >> ~/.msmtprc
+          echo "port 587" >> ~/.msmtprc
+          echo "from $GMAIL_USER" >> ~/.msmtprc
+          echo "auth on" >> ~/.msmtprc
+          echo "user $GMAIL_USER" >> ~/.msmtprc
+          echo "password $GMAIL_PASS" >> ~/.msmtprc
+          echo "tls on" >> ~/.msmtprc
+          echo "tls_starttls on" >> ~/.msmtprc
+          echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> ~/.msmtprc
+          chmod 600 ~/.msmtprc
+          echo "Your unit tests took X seconds. Y tests passed, Z failed." | mail -s "Unit Test Report" youry.allam@net.usj.edu.lb
