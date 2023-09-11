@@ -39,6 +39,7 @@ jobs:
         with:
           connection_url: ${{secrets.MAIL_CONNECTION}}
           subject: Github Actions job result
+          from: yuri allam
           to: youry.allam@net.usj.edu.lb
           body: Build job of ${{github.repository}} completed successfully!
           bcc: r2d2@example.com,hansolo@example.com
