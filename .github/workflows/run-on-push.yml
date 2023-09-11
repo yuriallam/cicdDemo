@@ -15,7 +15,6 @@ jobs:
 
       - name: Run Python script
         run: python3 test.py
-        continue-on-error: true
 
       - name: Upload Test Report
         uses: actions/upload-artifact@v2
@@ -33,7 +32,6 @@ jobs:
 
       - name: Run Python script
         run: python3 test2.py
-        continue-on-error: true
 
       - name: Upload Test Report
         uses: actions/upload-artifact@v2
