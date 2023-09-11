@@ -33,6 +33,7 @@ jobs:
     needs: [run-python-test1, run-python-test2]
     runs-on: ubuntu-latest
     container:
+      image: owasp/zap2docker-stable
       options: --user root
 
     steps:
