@@ -32,6 +32,8 @@ jobs:
   send-email-report:
     needs: [run-python-test1, run-python-test2]
     runs-on: ubuntu-latest
+    container:
+      options: --user root
 
     steps:
       - name: Send Email Report
