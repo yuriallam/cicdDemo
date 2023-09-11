@@ -44,5 +44,5 @@ jobs:
           body: Build job of ${{github.repository}} completed successfully!
           ignore_cert: true
           convert_markdown: true
-          attachments: test1_results.xml,test2_results.xml
+          attachments: ./test-reports/TEST-TestMathOperations-test-report1.xml,./test-reports/TEST-TestMathOperations-test-report2.xml
           priority: low

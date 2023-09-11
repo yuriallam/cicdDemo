@@ -12,4 +12,4 @@ class TestMathOperations(unittest.TestCase):
         self.assertEqual(add(-1, -1), -2)
 
 if __name__ == "__main__":
-    unittest.main(testRunner=XMLTestRunner(output='test-reports'))
+    unittest.main(testRunner=XMLTestRunner(output='test-reports', outsuffix='test-report1'))

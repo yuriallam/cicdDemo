@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="TestMathOperations-test-report1" tests="1" file=".py" time="0.006" timestamp="2023-09-11T19:08:06" failures="0" errors="0" skipped="0">
+	<testcase classname="TestMathOperations" name="test_add" time="0.006" timestamp="2023-09-11T19:08:06" file="test.py" line="8"/>
+</testsuite>
