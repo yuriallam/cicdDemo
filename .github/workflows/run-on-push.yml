@@ -32,27 +32,18 @@ jobs:
   send-email-report:
     needs: [run-python-test1, run-python-test2]
     runs-on: ubuntu-latest
-    container:
-      image: owasp/zap2docker-stable
-      options: --user root
 
     steps:
-      - name: Send Email Report
-        env:
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
-        run: |
-          apt-get update
-          apt-get install -y msmtp msmtp-mta mailutils
-          echo "account default" > ~/.msmtprc
-          echo "host smtp.office365.com" >> ~/.msmtprc
-          echo "port 587" >> ~/.msmtprc
-          echo "from $GMAIL_USER" >> ~/.msmtprc
-          echo "auth on" >> ~/.msmtprc
-          echo "user $GMAIL_USER" >> ~/.msmtprc
-          echo "password $GMAIL_PASS" >> ~/.msmtprc
-          echo "tls on" >> ~/.msmtprc
-          echo "tls_starttls on" >> ~/.msmtprc
-          echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> ~/.msmtprc
-          chmod 600 ~/.msmtprc
-          echo "Your unit tests took X seconds. Y tests passed, Z failed." | mail -s "Unit Test Report" example@microsoft.com
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          connection_url: ${{ secrets.MAIL_CONNECTION }}
+          subject: Github Actions job result
+          to: yuriallam7@gmail.com
+          from: yuri allam
+          body: Build job of ${{ github.repository }} completed successfully!
+          attachments: test1_results.xml,test2_results.xml
+          priority: low
