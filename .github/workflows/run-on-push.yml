@@ -13,10 +13,5 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
 
-      - name: Set up Python environment
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.9.6"
-
       - name: Run Python script
         run: python3 testing.py
