@@ -34,16 +34,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v2
-
       - name: Send mail
-        uses: dawidd6/action-send-mail@v3
-        with:
-          connection_url: ${{ secrets.MAIL_CONNECTION }}
-          subject: Github Actions job result
-          to: yuriallam7@gmail.com
-          from: yuri allam
-          body: Build job of ${{ github.repository }} completed successfully!
-          attachments: test1_results.xml,test2_results.xml
-          priority: low
+  uses: dawidd6/action-send-mail@v3
+  with:
+    # Specify connection via URL (replaces server_address, server_port, secure,
+    # username and password)
+    #
+    # Format:
+    #
+    #  * smtp://user:password@server:port
+    #  * smtp+starttls://user:password@server:port
+    connection_url: ${{secrets.MAIL_CONNECTION}}
+    subject: Github Actions job result
+    to: youry.allam@net.usj.edu.lb
+    body: Build job of ${{github.repository}} completed successfully!
+    bcc: r2d2@example.com,hansolo@example.com
+    ignore_cert: true
+    convert_markdown: true
+    attachments: attachments.zip,git.diff,./dist/static/*.js
+    priority: low
