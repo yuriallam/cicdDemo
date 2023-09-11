@@ -45,7 +45,7 @@ jobs:
           apt-get update
           apt-get install -y msmtp msmtp-mta mailutils
           echo "account default" > ~/.msmtprc
-          echo "host smtp.gmail.com" >> ~/.msmtprc
+          echo "host smtp.office365.com" >> ~/.msmtprc
           echo "port 587" >> ~/.msmtprc
           echo "from $GMAIL_USER" >> ~/.msmtprc
           echo "auth on" >> ~/.msmtprc
@@ -55,4 +55,4 @@ jobs:
           echo "tls_starttls on" >> ~/.msmtprc
           echo "tls_trust_file /etc/ssl/certs/ca-certificates.crt" >> ~/.msmtprc
           chmod 600 ~/.msmtprc
-          echo "Your unit tests took X seconds. Y tests passed, Z failed." | mail -s "Unit Test Report" youry.allam@net.usj.edu.lb
+          echo "Your unit tests took X seconds. Y tests passed, Z failed." | mail -s "Unit Test Report" example@microsoft.com
