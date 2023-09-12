@@ -23,46 +23,46 @@ jobs:
           name: test-report1
           path: ./test-reports/TEST-TestMathOperations-test-report1.xml
 
-    run-python-test2:
-      needs: run-python-test1
-      runs-on: self-hosted
+  run-python-test2:
+    needs: run-python-test1
+    runs-on: self-hosted
 
-      steps:
-        - name: Check out repository code
-          uses: actions/checkout@v2
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
 
-        - name: Run Python script
-          run: python3 test2.py
-          continue-on-error: true
+      - name: Run Python script
+        run: python3 test2.py
+        continue-on-error: true
 
-        - name: Upload Test Report
-          if: always()
-          uses: actions/upload-artifact@v2
-          with:
-            name: test-report2
-            path: ./test-reports/TEST-TestMathOperations-test-report2.xml
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report2
+          path: ./test-reports/TEST-TestMathOperations-test-report2.xml
 
-    send-email-report:
-      needs: [run-python-test1, run-python-test2]
-      runs-on: ubuntu-latest
+  send-email-report:
+    needs: [run-python-test1, run-python-test2]
+    runs-on: ubuntu-latest
 
-      steps:
-        - name: Download All Test Reports
-          if: always() # This ensures the step runs even if a previous job fails
-          uses: actions/download-artifact@v2
+    steps:
+      - name: Download All Test Reports
+        if: always() # This ensures the step runs even if a previous job fails
+        uses: actions/download-artifact@v2
 
-        - name: Send mail
-          if: always() # This ensures the step runs even if a previous job fails
-          uses: dawidd6/action-send-mail@v3
-          with:
-            connection_url: ${{secrets.MAIL_CONNECTION}}
-            subject: Github Actions job result
-            from: yuri allam
-            to: youry.allam@net.usj.edu.lb
-            body: Build job of ${{github.repository}} completed successfully!
-            ignore_cert: true
-            convert_markdown: true
-            attachments: ./test-report1/TEST-TestMathOperations-test-report1.xml,./test-report2/TEST-TestMathOperations-test-report2.xml
-            priority: low
+      - name: Send mail
+        if: always() # This ensures the step runs even if a previous job fails
+        uses: dawidd6/action-send-mail@v3
+        with:
+          connection_url: ${{secrets.MAIL_CONNECTION}}
+          subject: Github Actions job result
+          from: yuri allam
+          to: youry.allam@net.usj.edu.lb
+          body: Build job of ${{github.repository}} completed successfully!
+          ignore_cert: true
+          convert_markdown: true
+          attachments: ./test-report1/TEST-TestMathOperations-test-report1.xml,./test-report2/TEST-TestMathOperations-test-report2.xml
+          priority: low
 
-            path: ./test-reports/TEST-TestMathOperations-tes
+          path: ./test-reports/TEST-TestMathOperations-tes
