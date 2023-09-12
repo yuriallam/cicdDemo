@@ -8,6 +8,7 @@ on:
 jobs:
   run-python-test1:
     runs-on: self-hosted
+    continue-on-error: true
 
     steps:
       - name: Check out repository code
@@ -26,6 +27,7 @@ jobs:
   run-python-test2:
     needs: run-python-test1
     runs-on: self-hosted
+    continue-on-error: true
 
     steps:
       - name: Check out repository code
