@@ -19,7 +19,7 @@ jobs:
 
       - name: Set Job Status
         id: job1_status
-        run: echo "Job1 Status ${{ job.status }}"
+        run: echo "${{ job.status }}"
 
       - name: Upload Test Report
         if: always()
@@ -45,7 +45,7 @@ jobs:
 
       - name: Set Job Status
         id: job2_status
-        run: echo "Job2 Status ${{ job.status }}"
+        run: echo "${{ job.status }}"
 
       - name: Upload Test Report
         if: always()
@@ -71,12 +71,12 @@ jobs:
         run: |
           BODY="Build job of ${{ github.repository }} completed successfully!"
 
-          if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
-            BODY="Build job not completed because of test1 fail"
+          if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "success" ]; then
+            BODY="Build job not completed. Test1 fail"
           fi
 
-          if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
-            BODY="${BODY}. Test2 also failed."
+          if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "success" ]; then
+            BODY="${BODY}. Test2 failed."
           fi
 
           echo "Final Mail Body: $BODY"
