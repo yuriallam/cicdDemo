@@ -11,22 +11,22 @@ jobs:
     continue-on-error: true
 
     steps:
-    - name: Check out repository code
-      uses: actions/checkout@v2
+      - name: Check out repository code
+        uses: actions/checkout@v2
 
-    - name: Run Python script
-      run: python3 test.py
+      - name: Run Python script
+        run: python3 test.py
 
-    - name: Set Job Status
-      id: job1_status
-      run: echo "Job1 Status: ${{ job.status }}"
-      
-    - name: Upload Test Report
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-report1
-        path: ./test-reports/TEST-TestMathOperations-test-report1.xml
+      - name: Set Job Status
+        id: job1_status
+        run: echo "Job1 Status ${{ job.status }}"
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report1
+          path: ./test-reports/TEST-TestMathOperations-test-report1.xml
 
     outputs:
       job1_status: ${{ steps.job1_status.outputs.job1_status }}
@@ -37,22 +37,22 @@ jobs:
     continue-on-error: true
 
     steps:
-    - name: Check out repository code
-      uses: actions/checkout@v2
+      - name: Check out repository code
+        uses: actions/checkout@v2
 
-    - name: Run Python script
-      run: python3 test2.py
+      - name: Run Python script
+        run: python3 test2.py
 
-    - name: Set Job Status
-      id: job2_status
-      run: echo "Job2 Status: ${{ job.status }}"
+      - name: Set Job Status
+        id: job2_status
+        run: echo "Job2 Status ${{ job.status }}"
 
-    - name: Upload Test Report
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: test-report2
-        path: ./test-reports/TEST-TestMathOperations-test-report2.xml
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report2
+          path: ./test-reports/TEST-TestMathOperations-test-report2.xml
 
     outputs:
       job2_status: ${{ steps.job2_status.outputs.job2_status }}
@@ -62,37 +62,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Download All Test Reports
-      if: always()
-      uses: actions/download-artifact@v2
+      - name: Download All Test Reports
+        if: always()
+        uses: actions/download-artifact@v2
 
-    - name: Set Mail Body
-      id: mail_body
-      run: |
-        BODY="Build job of ${{ github.repository }} completed successfully!"
-        
-        if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
-          BODY="Build job not completed because of test1 fail"
-        fi
+      - name: Set Mail Body
+        id: mail_body
+        run: |
+          BODY="Build job of ${{ github.repository }} completed successfully!"
 
-        if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
-          BODY="${BODY}. Test2 also failed."
-        fi
+          if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
+            BODY="Build job not completed because of test1 fail"
+          fi
 
-        echo "Final Mail Body: $BODY"
+          if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
+            BODY="${BODY}. Test2 also failed."
+          fi
 
-        echo "mail_body=$BODY" >> $GITHUB_ENV
+          echo "Final Mail Body: $BODY"
 
-    - name: Send mail
-      if: always()
-      uses: dawidd6/action-send-mail@v3
-      with:
-        connection_url: ${{secrets.MAIL_CONNECTION}}
-        subject: Github Actions job result
-        from: yuri allam
-        to: youry.allam@net.usj.edu.lb
-        body: ${{ env.mail_body }}
-        ignore_cert: true
-        convert_markdown: true
-        attachments: ./test-report1/TEST-TestMathOperations-test-report1.xml,./test-report2/TEST-TestMathOperations-test-report2.xml
-        priority: low
+          echo "mail_body=$BODY" >> $GITHUB_ENV
+
+      - name: Send mail
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          connection_url: ${{secrets.MAIL_CONNECTION}}
+          subject: Github Actions job result
+          from: yuri allam
+          to: youry.allam@net.usj.edu.lb
+          body: ${{ env.mail_body }}
+          ignore_cert: true
+          convert_markdown: true
+          attachments: ./test-report1/TEST-TestMathOperations-test-report1.xml,./test-report2/TEST-TestMathOperations-test-report2.xml
+          priority: low
