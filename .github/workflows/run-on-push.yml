@@ -17,9 +17,15 @@ jobs:
       - name: Run Python script
         run: python3 test.py
 
-      - name: Set Job Status
+      - name: Determine Job Status
         id: job1_status
-        run: echo "${{ job.status }}"
+        run: echo "success" > job1_status.txt
+
+      - name: Upload status as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: job1_status
+          path: ./job1_status.txt
 
       - name: Upload Test Report
         if: always()
@@ -43,9 +49,15 @@ jobs:
       - name: Run Python script
         run: python3 test2.py
 
-      - name: Set Job Status
+      - name: Determine Job Status
         id: job2_status
-        run: echo "${{ job.status }}"
+        run: echo "success" > job2_status.txt
+
+      - name: Upload status as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: job2_status
+          path: ./job2_status.txt
 
       - name: Upload Test Report
         if: always()
@@ -62,26 +74,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download All Test Reports
-        if: always()
-        uses: actions/download-artifact@v2
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v2
 
-      - name: Set Mail Body
-        id: mail_body
-        run: |
-          BODY="Build job of ${{ github.repository }} completed successfully!"
+    - name: Determine Email Body
+      run: |
+        JOB1_STATUS=$(cat job1_status/job1_status.txt)
+        JOB2_STATUS=$(cat job2_status/job2_status.txt)
+        BODY="Build job of ${{ github.repository }} completed successfully!"
 
-          if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "success" ]; then
-            BODY="Build job not completed. Test1 fail"
-          fi
+        if [ "$JOB1_STATUS" != "success" ]; then
+          BODY="Build job not completed. Test1 fail"
+        fi
 
-          if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "success" ]; then
-            BODY="${BODY}. Test2 failed."
-          fi
+        if [ "$JOB2_STATUS" != "success" ]; then
+          BODY="${BODY}. Test2 also failed."
+        fi
 
-          echo "Final Mail Body: $BODY"
-
-          echo "mail_body=$BODY" >> $GITHUB_ENV
+        echo "Final Mail Body: $BODY"
+        echo "mail_body=$BODY" >> $GITHUB_ENV
 
       - name: Send mail
         if: always()
