@@ -15,12 +15,7 @@ jobs:
 
       - name: Run Python script
         id: run_test1
-        run: |
-          python3 test.py || echo "test1_failed=true" >> $GITHUB_ENV
-
-      - name: Set Test1 Status
-        id: test1_status
-        run: echo "::set-output name=test1_failed::$test1_failed"
+        run: python3 test.py
 
       - name: Upload Test Report
         if: always()
@@ -30,11 +25,11 @@ jobs:
           path: ./test-reports/TEST-TestMathOperations-test-report1.xml
 
     outputs:
-      test1_failed: ${{ steps.test1_status.outputs.test1_failed }}
+      job1_status: ${{ job.status }}
 
   run-python-test2:
-    needs: run-python-test1
     runs-on: self-hosted
+    needs: run-python-test1
 
     steps:
       - name: Check out repository code
@@ -42,12 +37,7 @@ jobs:
 
       - name: Run Python script
         id: run_test2
-        run: |
-          python3 test2.py || echo "test2_failed=true" >> $GITHUB_ENV
-
-      - name: Set Test2 Status
-        id: test2_status
-        run: echo "::set-output name=test2_failed::$test2_failed"
+        run: python3 test2.py
 
       - name: Upload Test Report
         if: always()
@@ -57,15 +47,15 @@ jobs:
           path: ./test-reports/TEST-TestMathOperations-test-report2.xml
 
     outputs:
-      test2_failed: ${{ steps.test2_status.outputs.test2_failed }}
+      job2_status: ${{ job.status }}
 
   send-email-report:
     needs: [run-python-test1, run-python-test2]
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
       - name: Download All Test Reports
-        if: always()
         uses: actions/download-artifact@v2
 
       - name: Set Mail Body
@@ -73,11 +63,11 @@ jobs:
         run: |
           BODY="Build job of ${{ github.repository }} completed successfully!"
 
-          if [ "${{ needs.run-python-test1.outputs.test1_failed }}" == "true" ]; then
+          if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
             BODY="Build job not completed because of test1 fail."
           fi
 
-          if [ "${{ needs.run-python-test2.outputs.test2_failed }}" == "true" ]; then
+          if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
             BODY="${BODY} Test2 also failed."
           fi
 
@@ -85,7 +75,6 @@ jobs:
           echo "mail_body=$BODY" >> $GITHUB_ENV
 
       - name: Send mail
-        if: always()
         uses: dawidd6/action-send-mail@v3
         with:
           connection_url: ${{secrets.MAIL_CONNECTION}}
