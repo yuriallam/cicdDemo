@@ -63,14 +63,18 @@ jobs:
       - name: Set Mail Body
         id: mail_body
         run: |
-          BODY="Build job of ${{ github.repository }} completed successfully!"
+          BODY="Build job of ${{ github.repository }} completed."
 
-          if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
-            BODY="Build job not completed because of test1 fail."
-          fi
-
-          if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
-            BODY="${BODY} Test2 also failed."
+          if [ "${{ needs.run-python-test1.outputs.job1_status }}" == "Success" ] && [ "${{ needs.run-python-test2.outputs.job2_status }}" == "Success" ]; then
+            BODY="${BODY} All tests completed successfully!"
+          else
+            BODY="${BODY} Some tests failed.\n"
+            if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
+              BODY="${BODY} - Test1 failed.\n"
+            fi
+            if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
+              BODY="${BODY} - Test2 failed.\n"
+            fi
           fi
 
           echo "Final Mail Body: $BODY"
