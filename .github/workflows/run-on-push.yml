@@ -8,12 +8,14 @@ on:
 jobs:
   run-python-test1:
     runs-on: self-hosted
+    continue-on-error: true
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
 
       - name: Run Python script
+        id: run_test1
         run: python3 test.py
 
       - name: Upload Test Report
@@ -23,17 +25,21 @@ jobs:
           name: test-report1
           path: ./test-reports/TEST-TestMathOperations-test-report1.xml
 
+    outputs:
+      test1_outcome: ${{ steps.run_test1.outcome }}
+
   run-python-test2:
-    needs: run-python-test1
     runs-on: self-hosted
+    needs: run-python-test1
+    continue-on-error: true
 
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
 
       - name: Run Python script
+        id: run_test2
         run: python3 test2.py
-        continue-on-error: true
 
       - name: Upload Test Report
         if: always()
@@ -42,27 +48,43 @@ jobs:
           name: test-report2
           path: ./test-reports/TEST-TestMathOperations-test-report2.xml
 
+    outputs:
+      test2_outcome: ${{ steps.run_test2.outcome }}
+
   send-email-report:
     needs: [run-python-test1, run-python-test2]
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
       - name: Download All Test Reports
-        if: always() # This ensures the step runs even if a previous job fails
         uses: actions/download-artifact@v2
 
+      - name: Set Mail Body
+        id: mail_body
+        run: |
+          if [ "${{ needs.run-python-test1.outputs.test1_outcome }}" == "success" ] && [ "${{ needs.run-python-test2.outputs.test2_outcome }}" == "success" ]; then
+            echo "mail_body=Build job of ${{ github.repository }} completed. All tests completed successfully!" >> $GITHUB_ENV
+          else
+            mail_body="Build job of ${{ github.repository }} completed. Some tests failed."
+            if [ "${{ needs.run-python-test1.outputs.test1_outcome }}" != "success" ]; then
+              mail_body="$mail_body - Test1 failed."
+            fi
+            if [ "${{ needs.run-python-test2.outputs.test2_outcome }}" != "success" ]; then
+              mail_body="$mail_body - Test2 failed."
+            fi
+            echo "mail_body=$mail_body" >> $GITHUB_ENV
+          fi
+
       - name: Send mail
-        if: always() # This ensures the step runs even if a previous job fails
         uses: dawidd6/action-send-mail@v3
         with:
           connection_url: ${{secrets.MAIL_CONNECTION}}
           subject: Github Actions job result
           from: yuri allam
           to: youry.allam@net.usj.edu.lb
-          body: Build job of ${{github.repository}} completed successfully!
+          body: ${{ env.mail_body }}
           ignore_cert: true
           convert_markdown: true
           attachments: ./test-report1/TEST-TestMathOperations-test-report1.xml,./test-report2/TEST-TestMathOperations-test-report2.xml
           priority: low
-
-          path: ./test-reports/TEST-TestMathOperations-tes
