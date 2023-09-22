@@ -17,15 +17,9 @@ jobs:
       - name: Run Python script
         run: python3 test.py
 
-      - name: Determine Job Status
+      - name: Set Job Status
         id: job1_status
-        run: echo "success" > job1_status.txt
-
-      - name: Upload status as an artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: job1_status
-          path: ./job1_status.txt
+        run: echo "Job1 Status ${{ job.status }}"
 
       - name: Upload Test Report
         if: always()
@@ -49,15 +43,9 @@ jobs:
       - name: Run Python script
         run: python3 test2.py
 
-      - name: Determine Job Status
+      - name: Set Job Status
         id: job2_status
-        run: echo "success" > job2_status.txt
-
-      - name: Upload status as an artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: job2_status
-          path: ./job2_status.txt
+        run: echo "Job2 Status ${{ job.status }}"
 
       - name: Upload Test Report
         if: always()
@@ -74,36 +62,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download All Artifacts
+      - name: Download All Test Reports
+        if: always()
         uses: actions/download-artifact@v2
 
-      - name: Determine Email Body
+      - name: Set Mail Body
+        id: mail_body
         run: |
-          JOB1_STATUS=$(cat job1_status/job1_status.txt)
-          JOB2_STATUS=$(cat job2_status/job2_status.txt)
           BODY="Build job of ${{ github.repository }} completed successfully!"
 
-          if [ "$JOB1_STATUS" != "success" ]; then
-            BODY="Build job not completed. Test1 fail"
+          if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
+            BODY="Build job not completed because of test1 fail"
           fi
 
-          if [ "$JOB2_STATUS" != "success" ]; then
+          if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
             BODY="${BODY}. Test2 also failed."
           fi
 
           echo "Final Mail Body: $BODY"
+
           echo "mail_body=$BODY" >> $GITHUB_ENV
 
-        - name: Send mail
-          if: always()
-          uses: dawidd6/action-send-mail@v3
-          with:
-            connection_url: ${{secrets.MAIL_CONNECTION}}
-            subject: Github Actions job result
-            from: yuri allam
-            to: youry.allam@net.usj.edu.lb
-            body: ${{ env.mail_body }}
-            ignore_cert: true
-            convert_markdown: true
-            attachments: ./test-report1/TEST-TestMathOperations-test-report1.xml,./test-report2/TEST-TestMathOperations-test-report2.xml
-            priority: low
+      - name: Send mail
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          connection_url: ${{secrets.MAIL_CONNECTION}}
+          subject: Github Actions job result
+          from: yuri allam
+          to: youry.allam@net.usj.edu.lb
+          body: ${{ env.mail_body }}
+          ignore_cert: true
+          convert_markdown: true
+          attachments: ./test-report1/TEST-TestMathOperations-test-report1.xml,./test-report2/TEST-TestMathOperations-test-report2.xml
+          priority: low
