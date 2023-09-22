@@ -74,25 +74,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v2
+    - name: Download All Artifacts
+      uses: actions/download-artifact@v2
 
-      - name: Determine Email Body
-        run: |
-          JOB1_STATUS=$(cat ./job1_status.txt)
-          JOB2_STATUS=$(cat ./job2_status.txt)
-          BODY="Build job of ${{ github.repository }} completed successfully!"
+    - name: Determine Email Body
+      run: |
+        JOB1_STATUS=$(cat job1_status/job1_status.txt)
+        JOB2_STATUS=$(cat job2_status/job2_status.txt)
+        BODY="Build job of ${{ github.repository }} completed successfully!"
 
-          if [ "$JOB1_STATUS" != "success" ]; then
-            BODY="Build job not completed. Test1 fail"
-          fi
+        if [ "$JOB1_STATUS" != "success" ]; then
+          BODY="Build job not completed. Test1 fail"
+        fi
 
-          if [ "$JOB2_STATUS" != "success" ]; then
-            BODY="${BODY}. Test2 also failed."
-          fi
+        if [ "$JOB2_STATUS" != "success" ]; then
+          BODY="${BODY}. Test2 also failed."
+        fi
 
-          echo "Final Mail Body: $BODY"
-          echo "mail_body=$BODY" >> $GITHUB_ENV
+        echo "Final Mail Body: $BODY"
+        echo "mail_body=$BODY" >> $GITHUB_ENV
 
       - name: Send mail
         if: always()
