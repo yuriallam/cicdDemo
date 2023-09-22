@@ -63,22 +63,18 @@ jobs:
       - name: Set Mail Body
         id: mail_body
         run: |
-          BODY="Build job of ${{ github.repository }} completed."
-
           if [ "${{ needs.run-python-test1.outputs.test1_outcome }}" == "success" ] && [ "${{ needs.run-python-test2.outputs.test2_outcome }}" == "success" ]; then
-            BODY="${BODY} All tests completed successfully!"
+            echo "mail_body=Build job of ${{ github.repository }} completed. All tests completed successfully!" >> $GITHUB_ENV
           else
-            BODY="${BODY} Some tests failed.\n"
+            mail_body="Build job of ${{ github.repository }} completed. Some tests failed."
             if [ "${{ needs.run-python-test1.outputs.test1_outcome }}" != "success" ]; then
-              BODY="${BODY} - Test1 failed.\n"
+              mail_body="$mail_body - Test1 failed."
             fi
             if [ "${{ needs.run-python-test2.outputs.test2_outcome }}" != "success" ]; then
-              BODY="${BODY} - Test2 failed.\n"
+              mail_body="$mail_body - Test2 failed."
             fi
+            echo "mail_body=$mail_body" >> $GITHUB_ENV
           fi
-
-          echo "Final Mail Body: $BODY"
-          echo "mail_body=$BODY" >> $GITHUB_ENV
 
       - name: Send mail
         uses: dawidd6/action-send-mail@v3
