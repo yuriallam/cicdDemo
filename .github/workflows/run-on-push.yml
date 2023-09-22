@@ -26,7 +26,7 @@ jobs:
           path: ./test-reports/TEST-TestMathOperations-test-report1.xml
 
     outputs:
-      job1_status: ${{ job.status }}
+      test1_outcome: ${{ steps.run_test1.outcome }}
 
   run-python-test2:
     runs-on: self-hosted
@@ -49,7 +49,7 @@ jobs:
           path: ./test-reports/TEST-TestMathOperations-test-report2.xml
 
     outputs:
-      job2_status: ${{ job.status }}
+      test2_outcome: ${{ steps.run_test2.outcome }}
 
   send-email-report:
     needs: [run-python-test1, run-python-test2]
@@ -65,14 +65,14 @@ jobs:
         run: |
           BODY="Build job of ${{ github.repository }} completed."
 
-          if [ "${{ needs.run-python-test1.outputs.job1_status }}" == "Success" ] && [ "${{ needs.run-python-test2.outputs.job2_status }}" == "Success" ]; then
+          if [ "${{ needs.run-python-test1.outputs.test1_outcome }}" == "success" ] && [ "${{ needs.run-python-test2.outputs.test2_outcome }}" == "success" ]; then
             BODY="${BODY} All tests completed successfully!"
           else
             BODY="${BODY} Some tests failed.\n"
-            if [ "${{ needs.run-python-test1.outputs.job1_status }}" != "Success" ]; then
+            if [ "${{ needs.run-python-test1.outputs.test1_outcome }}" != "success" ]; then
               BODY="${BODY} - Test1 failed.\n"
             fi
-            if [ "${{ needs.run-python-test2.outputs.job2_status }}" != "Success" ]; then
+            if [ "${{ needs.run-python-test2.outputs.test2_outcome }}" != "success" ]; then
               BODY="${BODY} - Test2 failed.\n"
             fi
           fi
